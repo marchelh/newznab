@@ -1190,8 +1190,14 @@ class Releases
 			$cleanArr = array('#', '@', '$', '%', '^', '§', '¨', '©', 'Ö');
 			$cleanRelName = str_replace($cleanArr, '', $row['relname']);
 			
-			$relid = $db->queryInsert(sprintf("insert into releases (name, searchname, totalpart, groupID, adddate, guid, categoryID, regexID, rageID, postdate, fromname, size, reqID, passwordstatus, completion) values (%s, %s, %d, %d, now(), %s, %d, %d, -1, %s, %s, %s, %s, %d, %f)", 
-										$db->escapeString($cleanRelName), $db->escapeString($cleanRelName), $row["parts"], $row["groupID"], $db->escapeString($relguid), $catId, $regexID, $db->escapeString($bindata["date"]), $db->escapeString($bindata["fromname"]), $totalSize, $reqID, ($page->site->checkpasswordedrar == "1" ? -1 : 0), ($relCompletion > 100 ? 100 : $relCompletion)));
+			//find releaser information
+			$releaser = NULL;
+			if (preg_match('/-(?P<releaser>[^-]+)$/i',$cleanRelName, $releaser_group)){
+				$releaser = $releaser_group['releaser'];
+			}
+			
+			$relid = $db->queryInsert(sprintf("insert into releases (name, searchname, totalpart, groupID, adddate, guid, categoryID, regexID, rageID, postdate, fromname, size, reqID, passwordstatus, completion, releaser) values (%s, %s, %d, %d, now(), %s, %d, %d, -1, %s, %s, %s, %s, %d, %f, %s)", 
+										$db->escapeString($cleanRelName), $db->escapeString($cleanRelName), $row["parts"], $row["groupID"], $db->escapeString($relguid), $catId, $regexID, $db->escapeString($bindata["date"]), $db->escapeString($bindata["fromname"]), $totalSize, $reqID, ($page->site->checkpasswordedrar == "1" ? -1 : 0), ($relCompletion > 100 ? 100 : $relCompletion), $db->escapeString($releaser)));
 			echo "Added release ".$cleanRelName."\n";
 			
 			//
